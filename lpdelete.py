@@ -46,16 +46,18 @@ def get_empty_dir(lpdir):
         if not dirs and not files:
             yield path 
 
-# Define function to delete empty directories using generated list from GetEmptyDir
-#TODO: Currently deletes empty directories at time of generation, but does not delete the empty directories
-# created after deleting the first "round" of empty directories.
-def del_empty_dir(lpdir):
-    empty_dir = list(get_empty_dir(lpdir))
-    for i in empty_dir:
-        os.rmdir(i)
-        print i, 'is empty and has been deleted.'
-    print 'All empty directories have been deleted.'
-
-
+# Define function to delete empty directories using generated list from GetEmptyDir.
+# Will run until no empty directories are found.
+def cleanup(lpdir):
+    while True:
+        empty_dir = list(get_empty_dir(lpdir))
+        for i in empty_dir:
+            os.rmdir(i)
+            print i, 'is empty and has been deleted.'
+        if empty_dir == []:
+            print 'All empty directories have been deleted.'
+            break
+    
+                
 #print comp_lists(lpdir,filename)
-#print del_empty_dir(lpdir)
+#print cleanup(lpdir)
