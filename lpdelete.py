@@ -31,9 +31,7 @@ def get_not_drawn(filename):
             return ndlist
     return ndlist
         
- # Define function that compares the two lists
- # TODO: Modify to actually delete the 'drawn' liber pages from the directory.
- # Currently, it prints which liber pages should be deleted.
+ # Define function that compares the two lists and deletes files that are not in 'not drawn' list
 def comp_lists(lpdir,filename):
     for i in list(get_docs(lpdir)):
         if os.path.splitext(os.path.split(i)[1])[0] not in get_not_drawn(filename):
