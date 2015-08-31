@@ -6,7 +6,11 @@ from openpyxl import load_workbook
 filename = raw_input("Enter full path to spreadsheet file (include file extension): ")
 #'C:\\Macomb ROW\\Returned Docs Delivery Script\\test\\Armada_Not_Drawn.xlsx'
 lpdir = raw_input("Enter full path of directory containing the documents: ")
-#'C:/Macomb ROW/Returned Docs Delivery Script/test/Armada Liber Page Docs' 
+#'C:/Macomb ROW/Returned Docs Delivery Script/test/Armada Liber Page Docs'
+fn_column = raw_input("Enter the spreadsheet column which lists the file names to be preserved (i.e. Enter '1' for column 'A', '2' for column 'B',etc.): ")
+ident_column = raw_input("Enter the spreadsheet column which lists the values for identifying which files should be preserved: ")
+keep_val = raw_input("Enter the value that identifies which files should be preserved: ")
+                     
 wb = load_workbook(filename, use_iterators=True)
 ws = wb.get_active_sheet()
 
@@ -16,25 +20,23 @@ def get_docs(lpdir):
         for fn in files:
             yield os.path.join(path,fn)
 
-#Define function that reads liber page values from a spreadsheet into a list (liber pages must be in column 'B'
-# and assumes row 1 is a header row and all liber pages are "Not Drawn")
-# TODO: Modify code to determine if liber page is 'Drawn' or 'Not Drawn', and then
-# pull liber page values for only 'Not Drawn' into list
-def get_not_drawn(filename):
-    ndlist = []
-    hr = ws.get_highest_row()
-    for i in range(2,hr):
-        lp = ws.cell(row = i, column = 2).value
-        if lp:
-            ndlist.append(str(lp))
+#Define function that reads values from a spreadsheet into a list, based on user input
+# Assumes row 1 is a header row 
+
+def list_tokeep(filename):
+    keeplist = []
+    for i in range(2,ws.get_highest_row()):
+        val = ws.cell(row = i, column = int(ident_column)).value
+        if val == keep_val:
+            keeplist.append(ws.cell(row = i,column = int(fn_column)).value)
         else:
-            return ndlist
-    return ndlist
+            return keeplist
+    return keeplist
         
  # Define function that compares the two lists and deletes files that are not in 'not drawn' list
 def comp_lists(lpdir,filename):
-    for i in list(get_docs(lpdir)):
-        if os.path.splitext(os.path.split(i)[1])[0] not in get_not_drawn(filename):
+    for i in get_docs(lpdir):
+        if os.path.splitext(os.path.split(i)[1])[0] not in list_tokeep(filename):
             os.remove(i)
             print i, "has been deleted."
 
@@ -57,7 +59,8 @@ def cleanup(lpdir):
         if empty_dir == []:
             print 'All empty directories have been deleted.'
             break
+
     
                 
-#print comp_lists(lpdir,filename)
-#print cleanup(lpdir)
+print comp_lists(lpdir,filename)
+print cleanup(lpdir)
