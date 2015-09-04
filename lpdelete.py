@@ -10,7 +10,7 @@ lpdir = raw_input("Enter full path of directory containing the documents: ")
 fn_column = raw_input("Enter the spreadsheet column which lists the file names to be preserved (i.e. Enter '1' for column 'A', '2' for column 'B',etc.): ")
 ident_column = raw_input("Enter the spreadsheet column which lists the values for identifying which files should be preserved: ")
 keep_val = raw_input("Enter the value that identifies which files should be preserved: ")
-                     
+               
 wb = load_workbook(filename, use_iterators=True)
 ws = wb.get_active_sheet()
 
@@ -23,25 +23,27 @@ def get_docs(lpdir):
 #Define function that reads values from a spreadsheet into a list, based on user input
 # Assumes row 1 is a header row 
 
-def list_tokeep(filename):
+def tokeep(filename):
     keeplist = []
-    for i in range(2,ws.get_highest_row()):
-        val = ws.cell(row = i, column = int(ident_column)).value
+    for i in range(2, ws.max_row):
+        name = str(ws.cell(row = i,column = int(fn_column)).value)
+        val = str(ws.cell(row = i, column = int(ident_column)).value)
         if val == keep_val:
-            keeplist.append(ws.cell(row = i,column = int(fn_column)).value)
-        else:
+            keeplist.append(name)
+        elif not name:
             return keeplist
     return keeplist
         
- # Define function that compares the two lists and deletes files that are not in 'not drawn' list
+ # Define function that compares the two lists and deletes files that are not in 'tokeep' list
 def comp_lists(lpdir,filename):
     for i in get_docs(lpdir):
-        if os.path.splitext(os.path.split(i)[1])[0] not in list_tokeep(filename):
-            os.remove(i)
-            print i, "has been deleted."
+        if os.path.splitext(os.path.split(i)[1])[0] not in tokeep(filename):
+            print i, "will be deleted"
+##            os.remove(i)
+##            print i, "has been deleted."
 
 
-# Define generator object to recursively yield empty directory paths (deleting the "Drawn" liber pages will leave empty directories
+# Define generator object to recursively yield empty directory paths (deleting files may leave empty directories
 # that should be cleaned up)
 def get_empty_dir(lpdir):
     for path,dirs,files in os.walk(lpdir):
@@ -61,6 +63,7 @@ def cleanup(lpdir):
             break
 
     
-                
+##print list(get_docs(lpdir))
+##print tokeep(filename)
 print comp_lists(lpdir,filename)
-print cleanup(lpdir)
+##print cleanup(lpdir)
