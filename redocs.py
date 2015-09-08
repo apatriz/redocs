@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+#NAME: redocs.py
+
+""" This python script reads a spreadsheet column containing file names into a list,
+    and compares it to a list of all files in a specific directory. The purpose is to identify files
+    that should be preserved, delete the rest, execute a cleanup of the directory structure to eliminate
+    empty directories and produce a deliverable consisting of only the needed files.
+    It also creates a new workbook.xlsx , containing only the entries for the preserved files."""
 
 
 import os
