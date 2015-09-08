@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-##TODO: Add functionality to create new spreadsheet containing only
-## entries for files that are preserved
 
 
 import os
@@ -12,6 +10,8 @@ lpdir = raw_input("Enter full path of directory containing the documents: ")
 fn_column = raw_input("Enter the spreadsheet column which lists the file names to be preserved (i.e. Enter '0' for column 'A', '1' for column 'B',etc.): ")
 ident_column = raw_input("Enter the spreadsheet column which lists the values for identifying which files should be preserved: ")
 keep_val = raw_input("Enter the value that identifies which files should be preserved: ")
+fold_col = raw_input("Enter the spreadsheet column which lists the file locations: ")
+comment_col = raw_input("Enter the spreadsheet column which lists the comments: ")
 
 wb = load_workbook(filename, use_iterators= True)
 ws = wb.get_active_sheet()
@@ -61,8 +61,31 @@ def cleanup(lpdir):
             print 'All empty directories have been deleted.'
             break
 
+def create_entry_list(filename):
+    entrylist = []
+    for row in ws.iter_rows():
+        if row[int(ident_column)].value == keep_val:
+            folder = row[int(fold_col)].value
+            fn = row[int(fn_column)].value
+            comment = row[int(comment_col)].value
+            entry = folder,fn,comment
+            entrylist.append(entry)
+    return entrylist
+
+def create_new_xl(filename):
+    from openpyxl import Workbook
+    nb = Workbook(write_only=True)
+    ns = nb.create_sheet()
+    el = create_entry_list(filename)
+    for row in el:
+        ns.append([i for i in row])
+    nb.save(lpdir + '/Returned.xlsx')
+    print "Saved new workbook."
+
 
 ##print list(get_docs(lpdir))
 # print tokeep(filename)
-print comp_lists(lpdir,filename)
-print cleanup(lpdir)
+#print comp_lists(lpdir,filename)
+# print cleanup(lpdir)
+# print create_entry_list(filename)
+print create_new_xl(filename)
