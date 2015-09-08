@@ -3,15 +3,29 @@
 
 import os
 from openpyxl import load_workbook
-filename = raw_input("Enter full path to spreadsheet file (include file extension): ")
-#'C:\\Macomb ROW\\Returned Docs Delivery Script\\test\\Armada_Not_Drawn.xlsx'
-lpdir = raw_input("Enter full path of directory containing the documents: ")
-#'C:/Macomb ROW/Returned Docs Delivery Script/test/Armada Liber Page Docs'
-fn_column = raw_input("Enter the spreadsheet column which lists the file names to be preserved (i.e. Enter '0' for column 'A', '1' for column 'B',etc.): ")
-ident_column = raw_input("Enter the spreadsheet column which lists the values for identifying which files should be preserved: ")
-keep_val = raw_input("Enter the value that identifies which files should be preserved: ")
-fold_col = raw_input("Enter the spreadsheet column which lists the file locations: ")
-comment_col = raw_input("Enter the spreadsheet column which lists the comments: ")
+from openpyxl import Workbook
+
+##raw_input("Enter full path to spreadsheet file (include file extension): ")
+filename = 'C:/Macomb ROW/9_Sterling_Heights/Sterling_Heights_Not_Drawn.xlsx'
+
+##raw_input("Enter full path of directory containing the documents: ")
+lpdir = 'C:/Macomb ROW/9_Sterling_Heights/Sterling_Heights_Docs_Working'
+
+##raw_input("Enter the spreadsheet column which lists the file names to be preserved (i.e. Enter '0' for column 'A', '1' for column 'B',etc.): ")
+fn_column = '1'
+
+##raw_input("Enter the spreadsheet column which lists the values for identifying which files should be preserved: ")
+ident_column = '4'
+
+##raw_input("Enter the value that identifies which files should be preserved: ")
+keep_val = 'n'
+
+##raw_input("Enter the spreadsheet column which lists the file locations: ")
+fold_col = '0'
+
+##raw_input("Enter the spreadsheet column which lists the comments: ")
+comment_col = '2'
+
 
 wb = load_workbook(filename, use_iterators= True)
 ws = wb.get_active_sheet()
@@ -40,6 +54,7 @@ def comp_lists(lpdir,filename):
             # print i, "will be deleted"
             os.remove(i)
             print i, "has been deleted."
+    print "All unwanted files deleted."
 
 
 # Define generator object to recursively yield empty directory paths (deleting files may leave empty directories
@@ -58,7 +73,7 @@ def cleanup(lpdir):
             os.rmdir(i)
             print i, 'is empty and has been deleted.'
         if empty_dir == []:
-            print 'All empty directories have been deleted.'
+            print 'All empty directories deleted.'
             break
 
 def create_entry_list(filename):
@@ -73,19 +88,18 @@ def create_entry_list(filename):
     return entrylist
 
 def create_new_xl(filename):
-    from openpyxl import Workbook
     nb = Workbook(write_only=True)
     ns = nb.create_sheet()
     el = create_entry_list(filename)
     for row in el:
         ns.append([i for i in row])
     nb.save(lpdir + '/Returned.xlsx')
-    print "Saved new workbook."
+    print "Saved new workbook to {0}/Returned.xlsx".format(lpdir)
 
 
 ##print list(get_docs(lpdir))
 # print tokeep(filename)
-#print comp_lists(lpdir,filename)
-# print cleanup(lpdir)
+print comp_lists(lpdir,filename)
+print cleanup(lpdir)
 # print create_entry_list(filename)
 print create_new_xl(filename)
