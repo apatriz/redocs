@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#NAME: redocs.py
+#AUTHOR: Alec Patrizio
 ##TODO: transform user input for column choice ("A","B",etc.) into corresponding integer val
 ## --current functionality requires all parameter inputs are strings (this can be modified if not using raw_input()) to obtain parameter values
 
@@ -13,6 +13,7 @@
 import os
 from openpyxl import load_workbook
 from openpyxl import Workbook
+from openpyxl.cell import column_index_from_string 
 
 ##raw_input("Enter full path to spreadsheet file (include file extension): ")
 filename = 'C:\\Macomb ROW\\script_testing\\redocs\\test\\Armada_Not_Drawn.xlsx'
@@ -20,20 +21,22 @@ filename = 'C:\\Macomb ROW\\script_testing\\redocs\\test\\Armada_Not_Drawn.xlsx'
 ##raw_input("Enter full path of directory containing the documents: ")
 lpdir = 'C:\\Macomb ROW\\script_testing\\redocs\\test\\Armada Liber Page Docs'
 
-##raw_input("Enter the spreadsheet column which lists the file names to be preserved (i.e. Enter '0' for column 'A', '1' for column 'B',etc.): ")
-fn_column = '1'
+##raw_input("Enter the spreadsheet column which lists the file names to be preserved (i.e. enter 'A' for column A, 'B' for column 'B',etc.): ")
+# using column_index_from_string() returns index numbers that begin at '1', therefore we must subtract 1 because the spreadsheet cells are read
+# and written as an iterable list using the optimized reader/writer in openpyxl, so column indexes in the iterables will start at '0'
+fn_column = column_index_from_string('B') - 1
 
 ##raw_input("Enter the spreadsheet column which lists the values for identifying which files should be preserved: ")
-ident_column = '4'
+ident_column = column_index_from_string('E') - 1
 
 ##raw_input("Enter the value that identifies which files should be preserved: ")
 keep_val = 'n'
 
 ##raw_input("Enter the spreadsheet column which lists the file locations: ")
-fold_col = '0'
+fold_col = column_index_from_string('A') - 1
 
 ##raw_input("Enter the spreadsheet column which lists the comments: ")
-comment_col = '2'
+comment_col = column_index_from_string('C') - 1
 
 ##raw_input("Enter the column labels for the output spreadsheet (i.e. Folder,Liber Page,Comments for column 1, 2 and 3 labels respectively): ")
 col_header = 'Folder','Liber Page','Comments'
@@ -53,8 +56,8 @@ def get_docs(lpdir):
 def tokeep(filename):
     keeplist = []
     for row in ws.iter_rows():
-        if row[int(ident_column)].value == keep_val:
-            keeplist.append(row[int(fn_column)].value)
+        if row[ident_column].value == keep_val:
+            keeplist.append(row[fn_column].value)
     return keeplist
 
 
@@ -87,20 +90,21 @@ def cleanup(lpdir):
             print 'All empty directories deleted.'
             break
 
-# define function that returns a list of data entries for the preserved files. Each entry in the list is a tuple containing the needed data for each file (i.e.(folder, filename, comments)).
+# define function that returns a list of data entries for the preserved files. Each entry in the list is a tuple
+# containing the needed data for each file (i.e.(folder, filename, comments)).
 # the first entry will always be the column header labels
 def create_entry_list(filename):
     entrylist = [(col_header)]
     prevfol = ''
     for row in ws.iter_rows():
-        folder = row[int(fold_col)].value
-        fn = row[int(fn_column)].value
-        comment = row[int(comment_col)].value
+        folder = row[fold_col].value
+        fn = row[fn_column].value
+        comment = row[comment_col].value
         if not folder:
             folder = prevfol
         else:
             prevfol = folder
-        if row[int(ident_column)].value == keep_val:
+        if row[ident_column].value == keep_val:
             entry = folder,fn,comment
             entrylist.append(entry)
     return entrylist
