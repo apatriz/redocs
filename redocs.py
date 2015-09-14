@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 #AUTHOR: Alec Patrizio
-##TODO: transform user input for column choice ("A","B",etc.) into corresponding integer val
-## --current functionality requires all parameter inputs are strings (this can be modified if not using raw_input()) to obtain parameter values
 
 """ This python script reads a spreadsheet column containing file names into a list,
     and compares it to a list of all files in a specific directory. The purpose is to identify files
