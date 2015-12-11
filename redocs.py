@@ -32,7 +32,7 @@ def get_docs(lpdir):
 def tokeep(filename):
 	keeplist = []
 	for row in ws.iter_rows():
-		if row[ident_column].value == keep_val:
+		if (row[ident_column].value).strip() == keep_val:
 			keeplist.append(row[fn_column].value)
 	return keeplist
 
